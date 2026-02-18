@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aspect Ratio Utility</title>
+    <meta
+      name="description"
+      content="Free online aspect ratio calculator. Resize images with max side or total pixel constraints while preserving aspect ratio."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://yourusername.github.io/" />
+    <meta property="og:title" content="Aspect Ratio Utility" />
+    <meta
+      property="og:description"
+      content="Resize images while preserving exact aspect ratio with pixel constraints."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --primary-dark: #4338ca;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --text: #1e293b;
+        --muted: #64748b;
+        --success: #16a34a;
+        --output-bg: #eef2ff;
+      }
+
+      [data-theme="dark"] {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --border: #334155;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --success: #22c55e;
+        --output-bg: #1e293b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 40px 20px;
+      }
+
+      .container {
+        flex: 1;
+        max-width: 720px;
+        margin: auto;
+        background: var(--card);
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      }
+
+      h1 {
+        margin-top: 0;
+        text-align: center;
+        font-size: 24px;
+      }
+
+      .section {
+        margin-bottom: 28px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .output {
+        margin-top: 25px;
+        padding: 20px;
+        border-radius: 10px;
+        background: var(--output-bg);
+      }
+
+      .output h3 {
+        margin-top: 0;
+      }
+
+      .stat {
+        margin: 8px 0;
+        font-size: 15px;
+      }
+
+      .stat strong {
+        font-size: 18px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 6px;
+        background: var(--success);
+        color: white;
+        margin-top: 10px;
+      }
+
+      .note {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .how-list {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text);
+      }
+      footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .theme-toggle {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--primary);
+      }
+
+      /* Move thumb when dark mode active */
+
+      [data-theme="dark"] .output {
+        background: #1e293b;
+      }
+
+      [data-theme="dark"] .container {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+      html {
+        transition:
+          background-color 0.25s ease,
+          color 0.25s ease;
+      }
+
+      body,
+      .container,
+      .output,
+      input,
+      button,
+      footer {
+        transition:
+          background-color 0.25s ease,
+          color 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      @media (max-width: 640px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div style="text-align: center; margin-bottom: 20px">
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+        Dark mode
+      </button>
+    </div>
+
+    <div class="container">
+      <h1>Aspect Ratio Utility</h1>
+
+      <div class="section">
+        <label>Reference Image</label>
+        <input type="file" id="imageInput" accept="image/*" />
+        <div class="note">Uploading auto-fills width and height.</div>
+      </div>
+
+      <div class="section grid">
+        <div>
+          <label>Width</label>
+          <input type="number" id="widthInput" placeholder="Enter width" />
+        </div>
+        <div>
+          <label>Height</label>
+          <input type="number" id="heightInput" placeholder="Enter height" />
+        </div>
+      </div>
+
+      <div class="section grid">
+        <div>
+          <label>Max Pixels Per Side</label>
+          <input type="number" id="maxSideInput" placeholder="Optional" />
+        </div>
+        <div>
+          <label>Max Total Pixels</label>
+          <input type="number" id="maxTotalInput" placeholder="Optional" />
+        </div>
+      </div>
+
+      <div class="output" id="output" style="display: none">
+        <h3>Calculated Resolution</h3>
+        <div class="stat">Width: <strong id="outWidth"></strong></div>
+        <div class="stat">Height: <strong id="outHeight"></strong></div>
+        <div class="stat">Total Pixels: <strong id="outPixels"></strong></div>
+        <div class="stat">Aspect Ratio: <strong id="outRatio"></strong></div>
+        <div id="constraintBadge" class="badge"></div>
+      </div>
+
+      <div class="section">
+        <h2>How to Use</h2>
+        <ul class="how-list">
+          <li>
+            <strong>Reference Image:</strong> Upload an image to auto-fill the
+            width and height fields.
+          </li>
+          <li>
+            <strong>Width & Height:</strong> You can manually enter width and
+            height if you don&apos;t want to use an image.
+          </li>
+          <li>
+            <strong>Max Pixels Per Side:</strong> Optional. Enter the maximum
+            number of pixels allowed for the width or height. The tool will
+            adjust the other dimension to maintain the aspect ratio.
+          </li>
+          <li>
+            <strong>Max Total Pixels:</strong> Optional. Enter the maximum total
+            number of pixels (width &times; height). The tool will scale the
+            image to fit within this limit, maintaining the aspect ratio.
+          </li>
+          <li>
+            <strong>Live Calculation:</strong> The tool updates automatically as
+            you type or upload an image—no need to click a button.
+          </li>
+          <li>
+            <strong>Output:</strong> The calculated width, height, total pixels,
+            and aspect ratio are displayed below the inputs.
+          </li>
+          <li>
+            <strong>Constraints:</strong> If any constraints are applied, they
+            will be shown in the “Constrained by” badge below the output.
+          </li>
+          <li>
+            <strong>Notes:</strong> The tool preserves the aspect ratio exactly.
+            It will also allow upscaling if your maximum pixel constraints allow
+            it.
+          </li>
+        </ul>
+      </div>
+    </div>
+    <footer>
+      © <span id="year"></span> Aspect Ratio Utility &ndash; Free Online Tool
+    </footer>
+
+    <script>
+      const html = document.documentElement;
+      const toggle = document.getElementById("themeToggle");
+
+      function setTheme(theme) {
+        html.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        toggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+      }
+
+      // Load saved or system theme
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setTheme(saved);
+      } else {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        setTheme(prefersDark ? "dark" : "light");
+      }
+
+      toggle.addEventListener("click", () => {
+        const current = html.getAttribute("data-theme");
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+
+      const imageInput = document.getElementById("imageInput");
+      const widthInput = document.getElementById("widthInput");
+      const heightInput = document.getElementById("heightInput");
+      const maxSideInput = document.getElementById("maxSideInput");
+      const maxTotalInput = document.getElementById("maxTotalInput");
+
+      const output = document.getElementById("output");
+      const outWidth = document.getElementById("outWidth");
+      const outHeight = document.getElementById("outHeight");
+      const outPixels = document.getElementById("outPixels");
+      const outRatio = document.getElementById("outRatio");
+      const constraintBadge = document.getElementById("constraintBadge");
+
+      /* Image Upload Handling */
+      imageInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        const img = new Image();
+
+        reader.onload = (e) => (img.src = e.target.result);
+        img.onload = () => {
+          widthInput.value = img.width;
+          heightInput.value = img.height;
+          compute();
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      /* Debounce */
+      let timeout;
+      function debounceCompute() {
+        clearTimeout(timeout);
+        timeout = setTimeout(compute, 150);
+      }
+
+      [widthInput, heightInput, maxSideInput, maxTotalInput].forEach((input) =>
+        input.addEventListener("input", debounceCompute),
+      );
+
+      function compute() {
+        const width = parseFloat(widthInput.value);
+        const height = parseFloat(heightInput.value);
+        const maxSide = parseFloat(maxSideInput.value);
+        const maxTotal = parseFloat(maxTotalInput.value);
+
+        if (!width || !height || width <= 0 || height <= 0) {
+          output.style.display = "none";
+          return;
+        }
+
+        const originalPixels = width * height;
+        const largestSide = Math.max(width, height);
+        const aspectRatio = width / height;
+
+        let scale = Infinity; // start with "no limit"
+        let appliedConstraints = [];
+
+        // Constraint: max pixels per side
+        if (maxSide && maxSide > 0) {
+          const sideScale = maxSide / largestSide;
+          scale = Math.min(scale, sideScale);
+          appliedConstraints.push("Max Side");
+        }
+
+        // Constraint: max total pixels
+        if (maxTotal && maxTotal > 0) {
+          const totalScale = Math.sqrt(maxTotal / originalPixels);
+          scale = Math.min(scale, totalScale);
+          appliedConstraints.push("Max Total Pixels");
+        }
+
+        // Apply scale to original width/height
+        let newWidth = Math.round(width * scale);
+        let newHeight = Math.round(height * scale);
+
+        // Ensure per-side max is not exceeded after rounding
+        if (maxSide && Math.max(newWidth, newHeight) > maxSide) {
+          if (newWidth >= newHeight) newWidth = maxSide;
+          else newHeight = maxSide;
+
+          // Adjust the other dimension to maintain aspect ratio
+          if (newWidth >= newHeight)
+            newHeight = Math.round(newWidth / aspectRatio);
+          else newWidth = Math.round(newHeight * aspectRatio);
+        }
+
+        // Ensure total pixels do not exceed maxTotal after rounding
+        while (maxTotal && newWidth * newHeight > maxTotal) {
+          if (newWidth >= newHeight) newWidth--;
+          else newHeight--;
+        }
+
+        // Update output
+        outWidth.textContent = newWidth;
+        outHeight.textContent = newHeight;
+        outPixels.textContent = (newWidth * newHeight).toLocaleString();
+        outRatio.textContent = (newWidth / newHeight).toFixed(4);
+
+        constraintBadge.textContent = appliedConstraints.length
+          ? "Constrained by: " + appliedConstraints.join(" + ")
+          : "No constraints applied";
+
+        output.style.display = "block";
+      }
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
